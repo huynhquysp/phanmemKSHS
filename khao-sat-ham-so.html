@@ -1,0 +1,945 @@
+<title>Khảo sát hàm số 12</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Lexend:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: graph-paper header band; formula editor on top; solution steps on the left, sticky graph on the right; one column on phones */
+:root{
+  --bg:#F3F5F9; --panel:#FFFFFF; --ink:#18213A; --muted:#5A6582; --line:#D9DFEB; --grid:#E8ECF4;
+  --accent:#2B59D9; --accent-soft:#E7EDFC; --curve:#C2362B; --asym:#7484AC; --bad:#C2362B;
+  --input-bg:#F7F9FD; --plot-bg:#FFFFFF; --axis:#3B4565;
+  --f-display:'Lexend','Be Vietnam Pro',system-ui,sans-serif;
+  --f-body:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1220; --panel:#161C2D; --ink:#E3E8F4; --muted:#98A3C0; --line:#2A3350; --grid:#1E2640;
+  --accent:#88A7FF; --accent-soft:#1E2947; --curve:#FF8072; --asym:#8592B8; --bad:#FF8072;
+  --input-bg:#0F1426; --plot-bg:#121829; --axis:#B5BFDA; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1220; --panel:#161C2D; --ink:#E3E8F4; --muted:#98A3C0; --line:#2A3350; --grid:#1E2640;
+  --accent:#88A7FF; --accent-soft:#1E2947; --curve:#FF8072; --asym:#8592B8; --bad:#FF8072;
+  --input-bg:#0F1426; --plot-bg:#121829; --axis:#B5BFDA; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{border-bottom:1px solid var(--line);
+  background-color:var(--panel);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px}
+header.top .wrap{padding-block:28px 22px}
+.eyebrow{font-family:var(--f-display);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(26px,4vw,36px);line-height:1.15;margin:4px 0 6px;text-wrap:balance}
+.lede{color:var(--muted);margin:0;max-width:62ch}
+
+main.wrap{padding-block:22px 48px;display:grid;gap:20px;grid-template-columns:minmax(0,1fr) 460px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.editor{grid-column:1/-1;padding:18px 20px;display:grid;gap:16px}
+.graph-card{grid-column:2;grid-row:2;position:sticky;top:16px;padding:14px}
+#steps{grid-column:1;grid-row:2;min-width:0;display:grid;gap:14px}
+@media (max-width:980px){
+  main.wrap{grid-template-columns:minmax(0,1fr)}
+  .graph-card{grid-column:1;grid-row:2;position:static}
+  #steps{grid-row:3}
+}
+
+/* tabs */
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tab{font:inherit;font-weight:600;font-size:14px;border:1px solid var(--line);background:var(--input-bg);color:var(--muted);
+  padding:8px 14px;border-radius:8px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;line-height:1.3}
+.tab small{font-family:var(--f-mono);font-weight:500;font-size:12px;opacity:.85}
+.tab[aria-selected="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.tab:focus-visible,.chip:focus-visible,.gbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.editor-row{display:flex;flex-wrap:wrap;gap:18px 28px;align-items:center}
+.formula{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-family:var(--f-display);font-size:22px;font-weight:500}
+.formula .yeq{font-style:italic;margin-right:4px}
+.formula .t{white-space:nowrap}
+.formula .t i{font-style:italic}
+.formula sup{font-size:.6em}
+.frac{display:inline-flex;flex-direction:column;align-items:center;gap:6px}
+.frac .row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
+.frac .bar{align-self:stretch;height:2px;background:var(--ink);border-radius:1px}
+.cf{display:inline-flex;flex-direction:column;align-items:center;gap:1px}
+.cf span{font-family:var(--f-mono);font-size:11px;color:var(--accent);line-height:1}
+.cf input{width:4.2em;font-family:var(--f-mono);font-size:17px;text-align:center;padding:5px 4px;border-radius:6px;
+  border:1.5px solid var(--line);background:var(--input-bg);color:var(--ink)}
+.cf input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.cf input.bad{border-color:var(--bad)}
+.hint{color:var(--muted);font-size:13px;margin:0}
+.samples{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.samples .lbl{font-size:13px;color:var(--muted);margin-right:4px}
+.chip{font:inherit;font-family:var(--f-mono);font-size:13px;border:1px dashed var(--line);background:transparent;color:var(--ink);
+  padding:4px 10px;border-radius:999px;cursor:pointer}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.preview{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px;border-radius:8px;background:var(--input-bg);border:1px solid var(--line);min-height:56px}
+.preview .lbl{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.preview .err{color:var(--bad);font-weight:500}
+
+/* steps */
+.step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 20px 18px;min-width:0}
+.step h2{font-family:var(--f-display);font-size:19px;font-weight:600;margin:0 0 8px;display:flex;align-items:center;gap:10px}
+.step h2 .n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--panel);font-size:14px;flex:none}
+.sub{padding-top:10px;margin-top:10px;border-top:1px dashed var(--line)}
+.sub:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.sub h3{font-family:var(--f-display);font-size:15px;font-weight:600;margin:0 0 4px;color:var(--accent)}
+.step p{margin:6px 0;max-width:72ch}
+.mx{overflow-x:auto;overflow-y:hidden;max-width:100%}
+mjx-container[display="true"]{margin:.5em 0 !important}
+.concl{background:var(--accent-soft);border-radius:8px;padding:8px 14px;margin-top:8px}
+.concl p{margin:4px 0}
+
+/* variation table */
+.bbt-wrap{overflow-x:auto;padding:4px 0 6px}
+.bbt{display:inline-grid;border:1.5px solid var(--ink);border-radius:4px;font-size:15px}
+.bbt>div{display:flex;align-items:center;justify-content:center;padding:6px 6px;min-height:40px}
+.bbt .bl{border-right:1.5px solid var(--ink);padding:6px 14px;font-weight:600}
+.bbt .r2,.bbt .r3{border-top:1px solid var(--ink)}
+.bbt .r3{height:100px;padding-block:0;align-items:stretch}
+.bbt .r3.bl{align-items:center}
+.bbt .bp.r3{padding-inline:4px}
+.bbt .v{display:flex;align-items:center}
+.bbt .v.top{align-self:flex-start;margin-top:6px}
+.bbt .v.bot{align-self:flex-end;margin-bottom:6px}
+.bbt .v.mid{align-self:center}
+.bbt .dl{padding:0;min-height:0}
+.bbt .dl::before{content:"";display:block;width:6px;height:100%;border-left:1.5px solid var(--ink);border-right:1.5px solid var(--ink);margin:0 auto}
+.bbt .dl.r2,.bbt .dl.r3{padding:0;align-items:stretch}
+.bbt .sg{font-size:18px;font-weight:600}
+.bbt .gp{padding:0}
+.bbt .gp svg{display:block}
+
+table.vt{border-collapse:collapse;font-variant-numeric:tabular-nums;margin:6px 0}
+table.vt th,table.vt td{border:1px solid var(--line);padding:4px 12px;text-align:center}
+table.vt th{background:var(--input-bg);font-weight:600}
+ul.pts{margin:6px 0;padding-left:20px}
+ul.pts li{margin:2px 0}
+
+/* graph */
+.ghead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.ghead h2{font-family:var(--f-display);font-size:17px;margin:0;font-weight:600}
+.gtools{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.gbtn{font:inherit;font-size:13px;min-width:32px;height:30px;padding:0 9px;border:1px solid var(--line);background:var(--input-bg);color:var(--ink);border-radius:6px;cursor:pointer}
+.gbtn:hover{border-color:var(--accent)}
+.eqlbl{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:4px;margin-left:4px;cursor:pointer}
+.plot{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--plot-bg)}
+#cv{display:block;width:100%;height:440px;touch-action:none;cursor:crosshair}
+@media (max-width:600px){#cv{height:340px}}
+#readout{position:absolute;left:8px;bottom:8px;font-family:var(--f-mono);font-size:12px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 8px;color:var(--ink);pointer-events:none}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:22px;height:0;border-top:3px solid var(--curve)}
+.sw.d{border-top:2px dashed var(--asym)}
+.sw.p{width:9px;height:9px;border:0;border-radius:50%;background:var(--accent)}
+.gnote{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+@media (prefers-reduced-motion:no-preference){.tab,.chip,.gbtn{transition:border-color .15s,background .15s}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Giải tích 12 · Chương I</div>
+    <h1>Khảo sát hàm số</h1>
+    <p class="lede">Chọn loại hàm, nhập hệ số ngay trên công thức. Lời giải hiện đủ ba bước: tập xác định, sự biến thiên, đồ thị.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card editor" aria-label="Nhập hàm số">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-cubic" data-type="cubic" aria-selected="true">Hàm bậc ba<small>y = ax³ + bx² + cx + d</small></button>
+      <button class="tab" role="tab" id="tab-rational" data-type="rational" aria-selected="false">Bậc hai / bậc một<small>y = (ax² + bx + c)/(dx + e)</small></button>
+      <button class="tab" role="tab" id="tab-homo" data-type="homo" aria-selected="false">Hàm nhất biến<small>y = (ax + b)/(cx + d)</small></button>
+    </div>
+
+    <div class="editor-row">
+      <div class="formula" data-panel="cubic">
+        <span class="yeq">y =</span>
+        <label class="cf"><span>a</span><input id="cubic-a" inputmode="decimal" autocomplete="off" value="1"></label><span class="t"><i>x</i><sup>3</sup> +</span>
+        <label class="cf"><span>b</span><input id="cubic-b" inputmode="decimal" autocomplete="off" value="-3"></label><span class="t"><i>x</i><sup>2</sup> +</span>
+        <label class="cf"><span>c</span><input id="cubic-c" inputmode="decimal" autocomplete="off" value="0"></label><span class="t"><i>x</i> +</span>
+        <label class="cf"><span>d</span><input id="cubic-d" inputmode="decimal" autocomplete="off" value="2"></label>
+      </div>
+
+      <div class="formula" data-panel="rational" hidden>
+        <span class="yeq">y =</span>
+        <div class="frac">
+          <div class="row">
+            <label class="cf"><span>a</span><input id="rational-a" inputmode="decimal" autocomplete="off" value="1"></label><span class="t"><i>x</i><sup>2</sup> +</span>
+            <label class="cf"><span>b</span><input id="rational-b" inputmode="decimal" autocomplete="off" value="-2"></label><span class="t"><i>x</i> +</span>
+            <label class="cf"><span>c</span><input id="rational-c" inputmode="decimal" autocomplete="off" value="2"></label>
+          </div>
+          <div class="bar"></div>
+          <div class="row">
+            <label class="cf"><span>d</span><input id="rational-d" inputmode="decimal" autocomplete="off" value="1"></label><span class="t"><i>x</i> +</span>
+            <label class="cf"><span>e</span><input id="rational-e" inputmode="decimal" autocomplete="off" value="-1"></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="formula" data-panel="homo" hidden>
+        <span class="yeq">y =</span>
+        <div class="frac">
+          <div class="row">
+            <label class="cf"><span>a</span><input id="homo-a" inputmode="decimal" autocomplete="off" value="2"></label><span class="t"><i>x</i> +</span>
+            <label class="cf"><span>b</span><input id="homo-b" inputmode="decimal" autocomplete="off" value="-1"></label>
+          </div>
+          <div class="bar"></div>
+          <div class="row">
+            <label class="cf"><span>c</span><input id="homo-c" inputmode="decimal" autocomplete="off" value="1"></label><span class="t"><i>x</i> +</span>
+            <label class="cf"><span>d</span><input id="homo-d" inputmode="decimal" autocomplete="off" value="1"></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="samples" id="samples"></div>
+    </div>
+    <p class="hint">Hệ số có thể là số nguyên, số thập phân (0,5) hoặc phân số (-3/4). Ô để trống được hiểu là 0. Lời giải tự cập nhật khi bạn gõ.</p>
+    <div class="preview" aria-live="polite"><span class="lbl">Hàm số</span><div id="preview"></div></div>
+  </section>
+
+  <section class="card graph-card" aria-label="Đồ thị">
+    <div class="ghead">
+      <h2>Đồ thị (C)</h2>
+      <div class="gtools">
+        <button class="gbtn" id="zin" title="Phóng to" aria-label="Phóng to">+</button>
+        <button class="gbtn" id="zout" title="Thu nhỏ" aria-label="Thu nhỏ">−</button>
+        <button class="gbtn" id="zfit" title="Đưa về khung vừa đủ">Vừa khung</button>
+        <label class="eqlbl"><input type="checkbox" id="eqscale"> Cùng tỉ lệ</label>
+      </div>
+    </div>
+    <div class="plot">
+      <canvas id="cv" aria-label="Đồ thị hàm số"></canvas>
+      <div id="readout" hidden></div>
+    </div>
+    <div class="legend">
+      <span><i class="sw"></i>Đồ thị (C)</span>
+      <span><i class="sw d"></i>Tiệm cận</span>
+      <span><i class="sw p"></i>Điểm đặc biệt</span>
+    </div>
+    <p class="gnote">Kéo để di chuyển, cuộn chuột để phóng to/thu nhỏ, rê chuột để đọc tọa độ.</p>
+  </section>
+
+  <article id="steps" aria-live="polite"></article>
+</main>
+
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' },
+  options: { enableMenu: false },
+  startup: {
+    typeset: false,
+    ready() { MathJax.startup.defaultReady(); MathJax.startup.promise.then(() => { mjReady = true; typesetAll(); }); }
+  }
+};
+var mjReady = false, mjChain = Promise.resolve();
+function typeset(els) {
+  if (!mjReady || !window.MathJax || !MathJax.typesetPromise) return;
+  mjChain = mjChain.then(() => { try { MathJax.typesetClear(els); } catch (e) {} return MathJax.typesetPromise(els); }).catch(() => {});
+}
+function typesetAll() { typeset([document.getElementById('preview'), document.getElementById('steps')]); }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+
+<script>
+/* ================= Exact arithmetic ================= */
+const babs = x => x < 0n ? -x : x;
+function bgcd(a, b) { a = babs(a); b = babs(b); while (b) { [a, b] = [b, a % b]; } return a; }
+function blcm(a, b) { return a / bgcd(a, b) * b; }
+function bisqrt(n) { if (n < 2n) return n; let x = n, y = (x + 1n) / 2n; while (y < x) { x = y; y = (x + n / x) / 2n; } return x; }
+
+class Fr {
+  constructor(n, d = 1n) {
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('Chia cho 0');
+    if (d < 0n) { n = -n; d = -d; }
+    const g = bgcd(n, d) || 1n;
+    this.n = n / g; this.d = d / g;
+  }
+  static of(x) { return x instanceof Fr ? x : new Fr(BigInt(x)); }
+  add(o) { o = Fr.of(o); return new Fr(this.n * o.d + o.n * this.d, this.d * o.d); }
+  sub(o) { o = Fr.of(o); return new Fr(this.n * o.d - o.n * this.d, this.d * o.d); }
+  mul(o) { o = Fr.of(o); return new Fr(this.n * o.n, this.d * o.d); }
+  div(o) { o = Fr.of(o); if (o.n === 0n) throw new Error('Chia cho 0'); return new Fr(this.n * o.d, this.d * o.n); }
+  neg() { return new Fr(-this.n, this.d); }
+  abs() { return this.n < 0n ? this.neg() : this; }
+  sign() { return this.n > 0n ? 1 : this.n < 0n ? -1 : 0; }
+  isZero() { return this.n === 0n; }
+  eq(o) { o = Fr.of(o); return this.n === o.n && this.d === o.d; }
+  num() { return Number(this.n) / Number(this.d); }
+  tex() {
+    if (this.d === 1n) return this.n.toString();
+    return (this.n < 0n ? '-' : '') + `\\frac{${babs(this.n)}}{${this.d}}`;
+  }
+}
+const ZERO = new Fr(0n), ONE = new Fr(1n);
+
+/* numbers of the form p + q·√r (p, q rational, r squarefree) */
+class Q {
+  constructor(p, q = ZERO, r = 1n) {
+    p = Fr.of(p); q = Fr.of(q); r = BigInt(r);
+    if (r === 1n) { p = p.add(q); q = ZERO; }
+    if (r === 0n || q.isZero()) { q = ZERO; r = 1n; }
+    this.p = p; this.q = q; this.r = r;
+  }
+  static of(x) { return x instanceof Q ? x : new Q(Fr.of(x)); }
+  rr(o) { return this.q.isZero() ? o.r : this.r; }
+  add(o) { o = Q.of(o); return new Q(this.p.add(o.p), this.q.add(o.q), this.rr(o)); }
+  neg() { return new Q(this.p.neg(), this.q.neg(), this.r); }
+  sub(o) { return this.add(Q.of(o).neg()); }
+  mul(o) {
+    o = Q.of(o); const r = this.rr(o);
+    return new Q(this.p.mul(o.p).add(this.q.mul(o.q).mul(new Fr(r))), this.p.mul(o.q).add(this.q.mul(o.p)), r);
+  }
+  conj() { return new Q(this.p, this.q.neg(), this.r); }
+  div(o) {
+    o = Q.of(o);
+    const den = o.p.mul(o.p).sub(o.q.mul(o.q).mul(new Fr(o.r)));
+    const t = this.mul(o.conj());
+    return new Q(t.p.div(den), t.q.div(den), t.r);
+  }
+  isZero() { return this.p.isZero() && this.q.isZero(); }
+  num() { return this.p.num() + this.q.num() * Math.sqrt(Number(this.r)); }
+  sign() {
+    const sp = this.p.sign(), sq = this.q.sign();
+    if (sq === 0) return sp;
+    if (sp === 0 || sp === sq) return sq;
+    const c = this.p.mul(this.p).sub(this.q.mul(this.q).mul(new Fr(this.r))).sign();
+    return c > 0 ? sp : c < 0 ? sq : 0;
+  }
+  tex() {
+    if (this.q.isZero()) return this.p.tex();
+    const D = blcm(this.p.d, this.q.d);
+    const A = this.p.n * (D / this.p.d), B = this.q.n * (D / this.q.d);
+    const bStr = (babs(B) === 1n ? '' : babs(B).toString()) + `\\sqrt{${this.r}}`;
+    if (A === 0n) return (B < 0n ? '-' : '') + (D === 1n ? bStr : `\\frac{${bStr}}{${D}}`);
+    if (D === 1n) return `${A}${B < 0n ? ' - ' : ' + '}${bStr}`;
+    if (A < 0n && B < 0n) return `-\\frac{${-A} + ${bStr}}{${D}}`;
+    return `\\frac{${A}${B < 0n ? ' - ' : ' + '}${bStr}}{${D}}`;
+  }
+}
+
+function sqfree(N) {
+  let k = 1n, m = 1n, n = N;
+  for (let i = 2n; i * i <= n && i < 100000n; i += (i === 2n ? 1n : 2n)) {
+    let c = 0; while (n % i === 0n) { n /= i; c++; }
+    if (c) { k *= i ** BigInt(c >> 1); if (c & 1) m *= i; }
+  }
+  const s = bisqrt(n);
+  if (s * s === n) k *= s; else m *= n;
+  return [k, m];
+}
+function sqrtFr(f) {
+  if (f.isZero()) return Q.of(ZERO);
+  const [k, m] = sqfree(f.n * f.d);
+  return new Q(ZERO, new Fr(k, f.d), m);
+}
+function evalFr(P, x) { let acc = ZERO; for (const c of P) acc = acc.mul(x).add(c); return acc; }
+function evalQ(P, x) { let acc = Q.of(ZERO); for (const c of P) acc = acc.mul(x).add(Q.of(c)); return acc; }
+function evalNum(P, x) { let acc = 0; for (const c of P) acc = acc * x + c.num(); return acc; }
+
+function solveQuad(A, B, C) {
+  const bh = B.div(2n);
+  const dp = bh.mul(bh).sub(A.mul(C));
+  const delta = B.mul(B).sub(A.mul(C).mul(4n));
+  if (dp.sign() < 0) return { dp, delta, roots: [] };
+  if (dp.isZero()) return { dp, delta, roots: [Q.of(bh.neg().div(A))] };
+  const s = sqrtFr(dp);
+  const r1 = Q.of(bh.neg()).sub(s).div(Q.of(A)), r2 = Q.of(bh.neg()).add(s).div(Q.of(A));
+  return { dp, delta, roots: [r1, r2].sort((u, v) => u.num() - v.num()) };
+}
+
+function divisors(n) {
+  if (n === 0n || n > 10n ** 12n) return null;
+  const out = [];
+  for (let i = 1n; i * i <= n; i++) if (n % i === 0n) { out.push(i); if (i * i !== n) out.push(n / i); }
+  return out;
+}
+function cubicSolve(P) {
+  const L = P.reduce((l, c) => blcm(l, c.d), 1n);
+  const I = P.map(c => c.n * (L / c.d));
+  let r = null;
+  if (I[3] === 0n) r = ZERO;
+  else {
+    const dA = divisors(babs(I[0])), dD = divisors(babs(I[3]));
+    if (dA && dD && dA.length * dD.length <= 50000) {
+      outer: for (const p of dD) for (const q of dA) for (const s of [1n, -1n]) {
+        const x = new Fr(s * p, q);
+        if (evalFr(P, x).isZero()) { r = x; break outer; }
+      }
+    }
+  }
+  if (r) {
+    const q2 = P[0], q1 = P[1].add(q2.mul(r)), q0 = P[2].add(q1.mul(r));
+    const qs = solveQuad(q2, q1, q0);
+    const roots = [];
+    for (const x of [Q.of(r), ...qs.roots]) if (!roots.some(y => y.sub(x).isZero())) roots.push(x);
+    roots.sort((u, v) => u.num() - v.num());
+    return { exact: true, r, quad: [q2, q1, q0], qs, roots };
+  }
+  return { exact: false, roots: numericCubic(P.map(c => c.num())) };
+}
+function numericCubic([a, b, c, d]) {
+  const f = x => ((a * x + b) * x + c) * x + d;
+  const M = 1 + Math.max(Math.abs(b / a), Math.abs(c / a), Math.abs(d / a));
+  const marks = [-M, M];
+  const D = 4 * b * b - 12 * a * c;
+  if (D > 0) { const s = Math.sqrt(D); marks.push((-2 * b - s) / (6 * a), (-2 * b + s) / (6 * a)); }
+  marks.sort((u, v) => u - v);
+  const roots = [];
+  for (let i = 0; i < marks.length - 1; i++) {
+    let l = marks[i], r = marks[i + 1], fl = f(l), fr = f(r);
+    if (fl === 0) { roots.push(l); continue; }
+    if (fl * fr > 0) continue;
+    for (let k = 0; k < 200; k++) { const m = (l + r) / 2, fm = f(m); if (fm === 0) { l = r = m; break; } if (fl * fm < 0) r = m; else { l = m; fl = fm; } }
+    roots.push((l + r) / 2);
+  }
+  if (f(marks[marks.length - 1]) === 0) roots.push(marks[marks.length - 1]);
+  return roots.filter((x, i) => i === 0 || Math.abs(x - roots[i - 1]) > 1e-9);
+}
+
+/* ================= TeX helpers ================= */
+function polyTex(cs) {
+  let out = ''; const n = cs.length - 1;
+  cs.forEach((c, i) => {
+    const p = n - i; if (c.isZero()) return;
+    const s = c.sign(), a = c.abs();
+    const coef = (a.eq(1) && p > 0) ? '' : a.tex();
+    const xs = p === 0 ? '' : p === 1 ? 'x' : `x^{${p}}`;
+    out += out === '' ? (s < 0 ? '-' : '') + coef + xs : (s < 0 ? ' - ' : ' + ') + coef + xs;
+  });
+  return out || '0';
+}
+const T = s => `\\(${s}\\)`;
+const DM = s => `<div class="mx">\\[${s}\\]</div>`;
+const infTex = s => s > 0 ? '+\\infty' : '-\\infty';
+const pt = (x, y) => `\\left(${x};\\,${y}\\right)`;
+const iv = (l, r) => `\\left(${l};\\,${r}\\right)`;
+const wrap = t => /\\frac|\\sqrt|[+-]/.test(t) ? `\\left(${t}\\right)` : t;
+const par = f => (f.sign() < 0 || f.d !== 1n) ? `\\left(${f.tex()}\\right)` : f.tex();
+const lim = (to, expr, val) => `\\lim\\limits_{x\\to ${to}} ${expr} = ${val}`;
+const side = (xt, s) => `{${wrap(xt)}}^{${s}}`;
+const orTex = list => list.length === 1 ? list[0] : `\\left[\\begin{array}{l}${list.join('\\\\')}\\end{array}\\right.`;
+const fmt = (v, k = 3) => { const s = (Math.round(v * 10 ** k) / 10 ** k).toString(); return s.replace('.', '{,}'); };
+const fmtPlain = (v, k = 2) => { if (!isFinite(v)) return '—'; const s = (Math.round(v * 10 ** k) / 10 ** k); return (Object.is(s, -0) ? 0 : s).toString().replace('.', ',').replace('-', '−'); };
+/* coefficient times a bracket: 1 → "", -1 → "-", else "(k)" */
+const grp = t => (t.startsWith('-') || / [+-] /.test(t)) ? `\\left(${t}\\right)` : t;
+const coefOf = f => f.eq(1) ? '' : f.eq(-1) ? '-' : par(f);
+/* R / (den) as a "+ ..." term */
+function plusFracTerm(R, denTex) {
+  const s = R.sign() < 0 ? ' - ' : ' + ', a = R.abs();
+  return a.d === 1n ? `${s}\\dfrac{${a.n}}{${denTex}}` : `${s}\\dfrac{${a.n}}{${a.d}\\left(${denTex}\\right)}`;
+}
+
+const step = (n, title, body) => `<section class="step"><h2><span class="n">${n}</span>${title}</h2>${body}</section>`;
+const sub = (t, body) => `<div class="sub"><h3>${t}</h3>${body}</div>`;
+
+/* ================= Variation table ================= */
+function signsFor(pts, g) {
+  return pts.slice(0, -1).map((p, i) => {
+    const l = p.xv, r = pts[i + 1].xv; let t;
+    if (l === -Infinity && r === Infinity) t = 0;
+    else if (l === -Infinity) t = r - 1;
+    else if (r === Infinity) t = l + 1;
+    else t = (l + r) / 2;
+    return Math.sign(g(t)) || 1;
+  });
+}
+function assignPos(pts, signs) {
+  const n = pts.length;
+  pts.forEach((p, i) => {
+    const prev = i > 0 ? signs[i - 1] : null, next = i < n - 1 ? signs[i] : null;
+    if (p.kind === 'end') p.pos = i === 0 ? (next > 0 ? 'bot' : 'top') : (prev > 0 ? 'top' : 'bot');
+    else if (p.kind === 'crit') p.pos = prev > 0 && next < 0 ? 'top' : prev < 0 && next > 0 ? 'bot' : 'mid';
+    else { p.lpos = prev > 0 ? 'top' : 'bot'; p.rpos = next > 0 ? 'bot' : 'top'; }
+  });
+}
+const AY = { top: 18, mid: 50, bot: 82 };
+function arrow(from, to) {
+  const x1 = 6, x2 = 66, y1 = AY[from], y2 = AY[to];
+  const ang = Math.atan2(y2 - y1, x2 - x1), L = 9, W = 4.2;
+  const bx = x2 - L * Math.cos(ang), by = y2 - L * Math.sin(ang);
+  const px = -Math.sin(ang) * W, py = Math.cos(ang) * W;
+  return `<svg viewBox="0 0 72 100" width="72" height="100" aria-hidden="true"><line x1="${x1}" y1="${y1}" x2="${bx.toFixed(2)}" y2="${by.toFixed(2)}" stroke="currentColor" stroke-width="1.5"/><polygon points="${x2},${y2} ${(bx + px).toFixed(2)},${(by + py).toFixed(2)} ${(bx - px).toFixed(2)},${(by - py).toFixed(2)}" fill="currentColor"/></svg>`;
+}
+function bbtHTML(pts, signs) {
+  const n = pts.length, cols = ['auto'];
+  let r1 = `<div class="bl r1" style="grid-row:1">${T('x')}</div>`;
+  let r2 = `<div class="bl r2" style="grid-row:2">${T("y'")}</div>`;
+  let r3 = `<div class="bl r3" style="grid-row:3">${T('y')}</div>`;
+  pts.forEach((p, i) => {
+    if (p.kind === 'asym') {
+      const c = cols.length + 1; cols.push('auto', '14px', 'auto');
+      r1 += `<div class="bp r1" style="grid-row:1;grid-column:${c}/span 3">${T(p.xTex)}</div>`;
+      r2 += `<div class="r2" style="grid-row:2;grid-column:${c}"></div><div class="dl r2" style="grid-row:2;grid-column:${c + 1}"></div><div class="r2" style="grid-row:2;grid-column:${c + 2}"></div>`;
+      r3 += `<div class="bp r3" style="grid-row:3;grid-column:${c}"><span class="v ${p.lpos}">${T(p.leftTex)}</span></div><div class="dl r3" style="grid-row:3;grid-column:${c + 1}"></div><div class="bp r3" style="grid-row:3;grid-column:${c + 2}"><span class="v ${p.rpos}">${T(p.rightTex)}</span></div>`;
+    } else {
+      const c = cols.length + 1; cols.push('auto');
+      r1 += `<div class="bp r1" style="grid-row:1;grid-column:${c}">${T(p.xTex)}</div>`;
+      r2 += `<div class="bp r2" style="grid-row:2;grid-column:${c}">${p.kind === 'crit' ? T('0') : ''}</div>`;
+      r3 += `<div class="bp r3" style="grid-row:3;grid-column:${c}"><span class="v ${p.pos}">${T(p.yTex)}</span></div>`;
+    }
+    if (i < n - 1) {
+      const c = cols.length + 1; cols.push('72px');
+      const from = p.kind === 'asym' ? p.rpos : p.pos, nx = pts[i + 1], to = nx.kind === 'asym' ? nx.lpos : nx.pos;
+      r1 += `<div class="r1" style="grid-row:1;grid-column:${c}"></div>`;
+      r2 += `<div class="sg r2" style="grid-row:2;grid-column:${c}">${signs[i] > 0 ? '+' : '−'}</div>`;
+      r3 += `<div class="gp r3" style="grid-row:3;grid-column:${c}">${arrow(from, to)}</div>`;
+    }
+  });
+  return `<div class="bbt-wrap"><div class="bbt" style="grid-template-columns:${cols.join(' ')}">${r1}${r2}${r3}</div></div>`;
+}
+function conclude(pts, signs) {
+  const ivs = signs.map((s, i) => ({ s, tex: iv(pts[i].xTex, pts[i + 1].xTex) }));
+  const hasAsym = pts.some(p => p.kind === 'asym');
+  const join = arr => arr.map(T).join(' và ');
+  let h = '';
+  if (!hasAsym && signs.every(s => s === signs[0])) {
+    h += `<p>Hàm số ${signs[0] > 0 ? 'đồng biến' : 'nghịch biến'} trên ${T('\\mathbb{R}')}.</p>`;
+  } else {
+    const inc = ivs.filter(v => v.s > 0).map(v => v.tex), dec = ivs.filter(v => v.s < 0).map(v => v.tex);
+    if (inc.length) h += `<p>Hàm số đồng biến trên ${inc.length > 1 ? 'các khoảng' : 'khoảng'} ${join(inc)}.</p>`;
+    if (dec.length) h += `<p>Hàm số nghịch biến trên ${dec.length > 1 ? 'các khoảng' : 'khoảng'} ${join(dec)}.</p>`;
+  }
+  const ext = pts.filter(p => p.kind === 'crit' && p.pos !== 'mid');
+  if (!ext.length) h += `<p>Hàm số không có cực trị.</p>`;
+  ext.filter(p => p.pos === 'top').forEach(p => h += `<p>Hàm số đạt cực đại tại ${T('x = ' + p.xTex)}, ${T('y_{\\text{CĐ}} = ' + p.yTex)}.</p>`);
+  ext.filter(p => p.pos === 'bot').forEach(p => h += `<p>Hàm số đạt cực tiểu tại ${T('x = ' + p.xTex)}, ${T('y_{\\text{CT}} = ' + p.yTex)}.</p>`);
+  return `<div class="concl">${h}</div>`;
+}
+function valueTable(xs, fy) {
+  const ys = xs.map(fy);
+  return `<div class="mx"><table class="vt"><tr><th>${T('x')}</th>${xs.map(x => `<td>${T(x.tex())}</td>`).join('')}</tr><tr><th>${T('y')}</th>${ys.map(y => `<td>${T(y.tex())}</td>`).join('')}</tr></table></div>`;
+}
+function pointList(items) {
+  return `<ul class="pts">${items.map(it => `<li>${it}</li>`).join('')}</ul>`;
+}
+
+/* ================= Cubic ================= */
+function anCubic({ a, b, c, d }) {
+  if (a.isZero()) return { error: 'Hệ số a phải khác 0 thì mới là hàm bậc ba.' };
+  const P = [a, b, c, d], fx = polyTex(P), sa = a.sign();
+  const fnum = x => evalNum(P, x);
+  let h = step(1, 'Tập xác định', `<p>${T('D = \\mathbb{R}')}.</p>`);
+
+  /* 2. Sự biến thiên */
+  let s2 = sub('a) Giới hạn tại vô cực', DM(lim('-\\infty', 'y', infTex(-sa)) + ' \\qquad ' + lim('+\\infty', 'y', infTex(sa))) +
+    `<p>(vì hệ số ${T('a = ' + a.tex())} ${sa > 0 ? 'dương' : 'âm'}). Hàm bậc ba không có tiệm cận đứng, tiệm cận ngang hay tiệm cận xiên.</p>`);
+
+  const A = a.mul(3n), B = b.mul(2n), C = c, yp = polyTex([A, B, C]);
+  const qs = solveQuad(A, B, C);
+  let d2 = `<p>${T("y' = " + yp)}.</p><p>${T("y' = 0 \\Leftrightarrow " + yp + ' = 0')}, có ${T("\\Delta' = b^2 - 3ac = " + par(b) + '^2 - 3\\cdot' + par(a) + '\\cdot' + par(c) + ' = ' + qs.dp.tex())}.</p>`;
+  const pts = [{ kind: 'end', xTex: '-\\infty', xv: -Infinity, yTex: infTex(-sa) }];
+  if (qs.roots.length === 2) {
+    const [x1, x2] = qs.roots, y1 = evalQ(P, x1), y2 = evalQ(P, x2);
+    d2 += `<p>Vì ${T("\\Delta' > 0")} nên ${T("y' = 0")} có hai nghiệm phân biệt:</p>` +
+      DM(`y' = 0 \\Leftrightarrow ` + orTex([`x = ${x1.tex()} \\Rightarrow y = ${y1.tex()}`, `x = ${x2.tex()} \\Rightarrow y = ${y2.tex()}`]));
+    pts.push({ kind: 'crit', xTex: x1.tex(), xv: x1.num(), yTex: y1.tex(), X: x1, Y: y1 }, { kind: 'crit', xTex: x2.tex(), xv: x2.num(), yTex: y2.tex(), X: x2, Y: y2 });
+  } else if (qs.roots.length === 1) {
+    const x0 = qs.roots[0], y0 = evalQ(P, x0);
+    d2 += `<p>Vì ${T("\\Delta' = 0")} nên ${T("y' = 0")} có nghiệm kép ${T('x = ' + x0.tex())} (khi đó ${T('y = ' + y0.tex())}); ${T("y'")} không đổi dấu khi qua nghiệm này.</p>`;
+    pts.push({ kind: 'crit', xTex: x0.tex(), xv: x0.num(), yTex: y0.tex(), X: x0, Y: y0 });
+  } else {
+    d2 += `<p>Vì ${T("\\Delta' < 0")} nên ${T("y' = 0")} vô nghiệm, ${T("y'")} luôn cùng dấu với hệ số ${T('a')}: ${T("y' " + (sa > 0 ? '> 0' : '< 0') + ',\\ \\forall x \\in \\mathbb{R}')}.</p>`;
+  }
+  pts.push({ kind: 'end', xTex: '+\\infty', xv: Infinity, yTex: infTex(sa) });
+  s2 += sub('b) Đạo hàm', d2);
+  const signs = signsFor(pts, x => evalNum([A, B, C], x));
+  assignPos(pts, signs);
+  s2 += sub('c) Bảng biến thiên', bbtHTML(pts, signs));
+  s2 += sub('d) Kết luận', conclude(pts, signs));
+  h += step(2, 'Sự biến thiên', s2);
+
+  /* 3. Đồ thị */
+  const gpts = [];
+  let s3 = '';
+  let ax = `<p><b>Giao với ${T('Oy')}:</b> cho ${T('x = 0 \\Rightarrow y = ' + d.tex())}. Đồ thị cắt ${T('Oy')} tại ${T(pt('0', d.tex()))}.</p>`;
+  gpts.push({ x: 0, y: d.num(), label: '', kind: 'ax' });
+  const cs = cubicSolve(P);
+  ax += `<p><b>Giao với ${T('Ox')}:</b> cho ${T('y = 0')}:</p>`;
+  if (cs.exact) {
+    const lin = cs.r.isZero() ? 'x' : `\\left(${polyTex([ONE, cs.r.neg()])}\\right)`;
+    const qd = cs.quad, lead = qd[0];
+    let fact = `${lin}\\left(${polyTex(qd)}\\right)`;
+    const sols = cs.roots.map(x => `x = ${x.tex()}`);
+    ax += DM(`${fx} = 0 \\Leftrightarrow ${fact} = 0 \\Leftrightarrow ` + orTex(sols));
+    if (cs.qs.roots.length === 0) ax += `<p>(phương trình ${T(polyTex(qd) + ' = 0')} vô nghiệm vì ${T('\\Delta = ' + cs.qs.delta.tex() + ' < 0')}).</p>`;
+    const ptxt = cs.roots.map(x => T(pt(x.tex(), '0'))).join(', ');
+    ax += `<p>Đồ thị cắt ${T('Ox')} tại ${cs.roots.length > 1 ? cs.roots.length + ' điểm' : 'điểm'} ${ptxt}.</p>`;
+    cs.roots.forEach(x => gpts.push({ x: x.num(), y: 0, label: '', kind: 'ax' }));
+  } else {
+    ax += `<p>Phương trình ${T(fx + ' = 0')} không có nghiệm hữu tỉ. Giải gần đúng (máy tính cầm tay) được:</p>` +
+      DM(cs.roots.map(x => 'x \\approx ' + fmt(x)).join(' \\quad ;\\quad ')) +
+      `<p>Đồ thị cắt ${T('Ox')} tại ${cs.roots.length} điểm có hoành độ như trên.</p>`;
+    cs.roots.forEach(x => gpts.push({ x, y: 0, label: '', kind: 'ax' }));
+  }
+  s3 += sub('a) Giao điểm với các trục tọa độ', ax);
+  const ix = Q.of(b.neg().div(a.mul(3n))), iy = evalQ(P, ix);
+  s3 += sub('b) Tâm đối xứng', `<p>${T("y'' = " + polyTex([a.mul(6n), b.mul(2n)]))}; ${T("y'' = 0 \\Leftrightarrow x = " + ix.tex() + ' \\Rightarrow y = ' + iy.tex())}.</p>` +
+    `<p>Điểm uốn ${T('I' + pt(ix.tex(), iy.tex()))} là tâm đối xứng của đồ thị.</p>`);
+  const ext = pts.filter(p => p.kind === 'crit' && p.pos !== 'mid');
+  const items = [];
+  ext.forEach(p => { const nm = p.pos === 'top' ? 'Điểm cực đại' : 'Điểm cực tiểu'; items.push(`${nm} ${T(pt(p.xTex, p.yTex))}`); gpts.push({ x: p.xv, y: p.Y.num(), label: p.pos === 'top' ? 'CĐ' : 'CT', kind: 'ext' }); });
+  items.push(`Tâm đối xứng ${T('I' + pt(ix.tex(), iy.tex()))}`);
+  gpts.push({ x: ix.num(), y: iy.num(), label: 'I', kind: 'center' });
+  const ixf = ix.p, xs = [-2, -1, 1, 2].map(k => ixf.add(new Fr(BigInt(k))));
+  s3 += sub('c) Vẽ đồ thị', `<p>Các điểm đặc biệt:</p>${pointList(items)}<p>Một số điểm khác thuộc đồ thị:</p>${valueTable([xs[0], xs[1], ixf, xs[2], xs[3]], x => evalFr(P, x))}` +
+    `<p>Dựa vào bảng biến thiên (${sa > 0 ? 'nhánh trái đi lên từ dưới, nhánh phải đi lên mãi' : 'nhánh trái đi xuống từ trên, nhánh phải đi xuống mãi'}) và các điểm trên, ta vẽ được đồ thị ${T('(C)')} như ở khung đồ thị.</p>`);
+  [xs[0], xs[1], xs[2], xs[3]].forEach(x => gpts.push({ x: x.num(), y: evalFr(P, x).num(), label: '', kind: 'extra' }));
+  h += step(3, 'Đồ thị', s3);
+  return { fnTex: fx, html: h, graph: { f: fnum, vas: [], has: [], obl: null, pts: gpts } };
+}
+
+/* ================= (ax² + bx + c)/(dx + e) ================= */
+function anRational({ a, b, c, d, e }) {
+  if (d.isZero()) return { error: 'Hệ số d ở mẫu phải khác 0.' };
+  if (a.isZero()) return { error: 'Hệ số a phải khác 0 (nếu a = 0 thì đây là hàm nhất biến).' };
+  const p = a.div(d), q = b.sub(p.mul(e)).div(d), R = c.sub(q.mul(e));
+  if (R.isZero()) return { error: 'Tử số chia hết cho mẫu số nên hàm số suy biến thành hàm bậc nhất. Hãy đổi hệ số.' };
+  const N = [a, b, c], Dn = [d, e], nt = polyTex(N), dt = polyTex(Dn);
+  const fx = `\\dfrac{${nt}}{${dt}}`;
+  const x0 = e.neg().div(d), x0t = x0.tex(), sp = p.sign(), sR = R.sign() * d.sign();
+  const fnum = x => evalNum(N, x) / evalNum(Dn, x);
+  const lin = polyTex([p, q]);
+  let h = step(1, 'Tập xác định', `<p>${T('D = \\mathbb{R}\\setminus\\left\\{' + x0t + '\\right\\}')}.</p>`);
+
+  let s2 = '';
+  let lm = `<p>Thực hiện phép chia tử cho mẫu:</p>` +
+    DM(`${nt} = \\left(${dt}\\right)${grp(lin)} ${R.sign() < 0 ? '-' : '+'} ${R.abs().tex()}`) +
+    DM(`\\Rightarrow y = ${lin}${plusFracTerm(R, dt)}`);
+  lm += `<p><b>Giới hạn tại vô cực:</b></p>` + DM(lim('-\\infty', 'y', infTex(-sp)) + ' \\qquad ' + lim('+\\infty', 'y', infTex(sp)));
+  lm += `<p><b>Tiệm cận đứng:</b></p>` + DM(lim(side(x0t, '-'), 'y', infTex(-sR)) + ' \\qquad ' + lim(side(x0t, '+'), 'y', infTex(sR))) +
+    `<p>nên đường thẳng ${T('x = ' + x0t)} là tiệm cận đứng của đồ thị.</p>`;
+  lm += `<p><b>Tiệm cận xiên:</b></p>` + DM(`\\lim\\limits_{x\\to\\pm\\infty}\\left[y - ${grp(lin)}\\right] = \\lim\\limits_{x\\to\\pm\\infty}${plusFracTerm(R, dt).replace(/^ \+ /, '')} = 0`) +
+    `<p>nên đường thẳng ${T('y = ' + lin)} là tiệm cận xiên của đồ thị. Đồ thị không có tiệm cận ngang.</p>`;
+  s2 += sub('a) Giới hạn và tiệm cận', lm);
+
+  const g = [a.mul(d), a.mul(e).mul(2n), b.mul(e).sub(c.mul(d))], gt = polyTex(g);
+  const qs = solveQuad(g[0], g[1], g[2]);
+  let d2 = DM(`y' = \\dfrac{\\left(${polyTex([a.mul(2n), b])}\\right)\\left(${dt}\\right) ${d.eq(1) ? '-' : '- ' + par(d)}\\left(${nt}\\right)}{\\left(${dt}\\right)^2} = \\dfrac{${gt}}{\\left(${dt}\\right)^2}`);
+  d2 += `<p>${T("y' = 0 \\Leftrightarrow " + gt + ' = 0')} (với ${T('x \\ne ' + x0t)}), có ${T("\\Delta' = " + qs.dp.tex())}.</p>`;
+  const pts = [{ kind: 'end', xTex: '-\\infty', xv: -Infinity, yTex: infTex(-sp) }];
+  const asym = { kind: 'asym', xTex: x0t, xv: x0.num(), leftTex: infTex(-sR), rightTex: infTex(sR) };
+  const fq = x => evalQ(N, x).div(evalQ(Dn, x));
+  if (qs.roots.length === 2) {
+    const [x1, x2] = qs.roots, y1 = fq(x1), y2 = fq(x2);
+    d2 += `<p>Vì ${T("\\Delta' > 0")} nên:</p>` + DM(`y' = 0 \\Leftrightarrow ` + orTex([`x = ${x1.tex()} \\Rightarrow y = ${y1.tex()}`, `x = ${x2.tex()} \\Rightarrow y = ${y2.tex()}`]));
+    pts.push({ kind: 'crit', xTex: x1.tex(), xv: x1.num(), yTex: y1.tex(), Y: y1 }, asym, { kind: 'crit', xTex: x2.tex(), xv: x2.num(), yTex: y2.tex(), Y: y2 });
+  } else {
+    const sg = g[0].sign();
+    d2 += `<p>Vì ${T("\\Delta' < 0")} nên tử số của ${T("y'")} luôn cùng dấu với ${T(par(g[0]))}: ${T("y' " + (sg > 0 ? '> 0' : '< 0') + ',\\ \\forall x \\ne ' + x0t)}.</p>`;
+    pts.push(asym);
+  }
+  pts.push({ kind: 'end', xTex: '+\\infty', xv: Infinity, yTex: infTex(sp) });
+  s2 += sub('b) Đạo hàm', d2);
+  const signs = signsFor(pts, x => evalNum(g, x));
+  assignPos(pts, signs);
+  s2 += sub('c) Bảng biến thiên', bbtHTML(pts, signs));
+  s2 += sub('d) Kết luận', conclude(pts, signs));
+  h += step(2, 'Sự biến thiên', s2);
+
+  /* 3. Đồ thị */
+  const gpts = [];
+  let ax = '';
+  if (!e.isZero()) {
+    const y0 = c.div(e);
+    ax += `<p><b>Giao với ${T('Oy')}:</b> cho ${T('x = 0 \\Rightarrow y = ' + y0.tex())}. Đồ thị cắt ${T('Oy')} tại ${T(pt('0', y0.tex()))}.</p>`;
+    gpts.push({ x: 0, y: y0.num(), label: '', kind: 'ax' });
+  } else ax += `<p><b>Giao với ${T('Oy')}:</b> ${T('x = 0 \\notin D')} nên đồ thị không cắt trục ${T('Oy')}.</p>`;
+  const oq = solveQuad(a, b, c);
+  ax += `<p><b>Giao với ${T('Ox')}:</b> cho ${T('y = 0 \\Leftrightarrow ' + nt + ' = 0')} (với ${T('x \\ne ' + x0t)}), ${T('\\Delta = b^2 - 4ac = ' + oq.delta.tex())}.</p>`;
+  if (oq.roots.length) {
+    ax += DM(orTex(oq.roots.map(x => `x = ${x.tex()}`)));
+    ax += `<p>Đồ thị cắt ${T('Ox')} tại ${oq.roots.map(x => T(pt(x.tex(), '0'))).join(' và ')}.</p>`;
+    oq.roots.forEach(x => gpts.push({ x: x.num(), y: 0, label: '', kind: 'ax' }));
+  } else ax += `<p>Phương trình vô nghiệm nên đồ thị không cắt trục ${T('Ox')}.</p>`;
+  let s3 = sub('a) Giao điểm với các trục tọa độ', ax);
+  const iy = p.mul(x0).add(q);
+  s3 += sub('b) Tâm đối xứng', `<p>Giao điểm của tiệm cận đứng ${T('x = ' + x0t)} và tiệm cận xiên ${T('y = ' + lin)}: thay ${T('x = ' + x0t)} vào được ${T('y = ' + iy.tex())}.</p>` +
+    `<p>Đồ thị nhận ${T('I' + pt(x0t, iy.tex()))} làm tâm đối xứng.</p>`);
+  const items = [];
+  pts.filter(p => p.kind === 'crit').forEach(pp => { items.push(`${pp.pos === 'top' ? 'Điểm cực đại' : 'Điểm cực tiểu'} ${T(pt(pp.xTex, pp.yTex))}`); gpts.push({ x: pp.xv, y: pp.Y.num(), label: pp.pos === 'top' ? 'CĐ' : 'CT', kind: 'ext' }); });
+  items.push(`Tâm đối xứng ${T('I' + pt(x0t, iy.tex()))}`);
+  gpts.push({ x: x0.num(), y: iy.num(), label: 'I', kind: 'center' });
+  const xs = [-2, -1, 1, 2].map(k => x0.add(new Fr(BigInt(k))));
+  const fy = x => evalFr(N, x).div(evalFr(Dn, x));
+  s3 += sub('c) Vẽ đồ thị', `<p>Các điểm đặc biệt:</p>${pointList(items)}<p>Một số điểm khác thuộc đồ thị:</p>${valueTable(xs, fy)}` +
+    `<p>Vẽ hai đường tiệm cận trước, sau đó dựa vào bảng biến thiên vẽ hai nhánh của đồ thị ${T('(C)')} đối xứng nhau qua ${T('I')}.</p>`);
+  xs.forEach(x => gpts.push({ x: x.num(), y: fy(x).num(), label: '', kind: 'extra' }));
+  h += step(3, 'Đồ thị', s3);
+  return { fnTex: fx, html: h, graph: { f: fnum, vas: [x0.num()], has: [], obl: { m: p.num(), b: q.num() }, pts: gpts } };
+}
+
+/* ================= (ax + b)/(cx + d) ================= */
+function anHomo({ a, b, c, d }) {
+  if (c.isZero()) return { error: 'Hệ số c ở mẫu phải khác 0.' };
+  const det = a.mul(d).sub(b.mul(c));
+  if (det.isZero()) return { error: 'ad − bc = 0 nên hàm số là hàm hằng (trên tập xác định). Hãy đổi hệ số.' };
+  const N = [a, b], Dn = [c, d], nt = polyTex(N), dt = polyTex(Dn);
+  const fx = `\\dfrac{${nt}}{${dt}}`;
+  const x0 = d.neg().div(c), x0t = x0.tex(), ya = a.div(c), yat = ya.tex();
+  const K = a.mul(x0).add(b), sR = K.sign() * c.sign(), sd = det.sign();
+  const fnum = x => evalNum(N, x) / evalNum(Dn, x);
+  let h = step(1, 'Tập xác định', `<p>${T('D = \\mathbb{R}\\setminus\\left\\{' + x0t + '\\right\\}')}.</p>`);
+
+  let lm = `<p><b>Tiệm cận ngang:</b></p>` + DM(`\\lim\\limits_{x\\to\\pm\\infty} y = \\lim\\limits_{x\\to\\pm\\infty}\\dfrac{${polyTex([a, b])}}{${dt}} = \\dfrac{a}{c} = ${yat}`) +
+    `<p>nên đường thẳng ${T('y = ' + yat)} là tiệm cận ngang của đồ thị.</p>`;
+  lm += `<p><b>Tiệm cận đứng:</b></p>` + DM(lim(side(x0t, '-'), 'y', infTex(-sR)) + ' \\qquad ' + lim(side(x0t, '+'), 'y', infTex(sR))) +
+    `<p>nên đường thẳng ${T('x = ' + x0t)} là tiệm cận đứng của đồ thị.</p>`;
+  let s2 = sub('a) Giới hạn và tiệm cận', lm);
+
+  let d2 = DM(`y' = \\dfrac{ad - bc}{\\left(cx + d\\right)^2} = \\dfrac{${par(a)}\\cdot${par(d)} - ${par(b)}\\cdot${par(c)}}{\\left(${dt}\\right)^2} = \\dfrac{${det.tex()}}{\\left(${dt}\\right)^2}`);
+  d2 += `<p>${T("y' " + (sd > 0 ? '> 0' : '< 0') + ',\\ \\forall x \\ne ' + x0t)}, phương trình ${T("y' = 0")} vô nghiệm.</p>`;
+  s2 += sub('b) Đạo hàm', d2);
+  const pts = [
+    { kind: 'end', xTex: '-\\infty', xv: -Infinity, yTex: yat },
+    { kind: 'asym', xTex: x0t, xv: x0.num(), leftTex: infTex(-sR), rightTex: infTex(sR) },
+    { kind: 'end', xTex: '+\\infty', xv: Infinity, yTex: yat }];
+  const signs = [sd, sd];
+  assignPos(pts, signs);
+  s2 += sub('c) Bảng biến thiên', bbtHTML(pts, signs));
+  s2 += sub('d) Kết luận', conclude(pts, signs));
+  h += step(2, 'Sự biến thiên', s2);
+
+  const gpts = [];
+  let ax = '';
+  if (!d.isZero()) {
+    const y0 = b.div(d);
+    ax += `<p><b>Giao với ${T('Oy')}:</b> cho ${T('x = 0 \\Rightarrow y = ' + y0.tex())}. Đồ thị cắt ${T('Oy')} tại ${T(pt('0', y0.tex()))}.</p>`;
+    gpts.push({ x: 0, y: y0.num(), label: '', kind: 'ax' });
+  } else ax += `<p><b>Giao với ${T('Oy')}:</b> ${T('x = 0 \\notin D')} nên đồ thị không cắt trục ${T('Oy')}.</p>`;
+  if (!a.isZero()) {
+    const xr = b.neg().div(a);
+    ax += `<p><b>Giao với ${T('Ox')}:</b> cho ${T('y = 0 \\Leftrightarrow ' + nt + ' = 0 \\Leftrightarrow x = ' + xr.tex())}. Đồ thị cắt ${T('Ox')} tại ${T(pt(xr.tex(), '0'))}.</p>`;
+    gpts.push({ x: xr.num(), y: 0, label: '', kind: 'ax' });
+  } else ax += `<p><b>Giao với ${T('Ox')}:</b> ${T('y = 0 \\Leftrightarrow ' + b.tex() + ' = 0')} (vô lí) nên đồ thị không cắt trục ${T('Ox')}.</p>`;
+  let s3 = sub('a) Giao điểm với các trục tọa độ', ax);
+  s3 += sub('b) Tâm đối xứng', `<p>Giao điểm của tiệm cận đứng ${T('x = ' + x0t)} và tiệm cận ngang ${T('y = ' + yat)} là ${T('I' + pt(x0t, yat))}.</p><p>Đồ thị nhận ${T('I')} làm tâm đối xứng.</p>`);
+  gpts.push({ x: x0.num(), y: ya.num(), label: 'I', kind: 'center' });
+  const xs = [-2, -1, 1, 2].map(k => x0.add(new Fr(BigInt(k))));
+  const fy = x => evalFr(N, x).div(evalFr(Dn, x));
+  s3 += sub('c) Vẽ đồ thị', `<p>Một số điểm thuộc đồ thị:</p>${valueTable(xs, fy)}` +
+    `<p>Vẽ hai đường tiệm cận, sau đó dựa vào bảng biến thiên vẽ hai nhánh hypebol của ${T('(C)')} đối xứng nhau qua ${T('I')}.</p>`);
+  xs.forEach(x => gpts.push({ x: x.num(), y: fy(x).num(), label: '', kind: 'extra' }));
+  h += step(3, 'Đồ thị', s3);
+  return { fnTex: fx, html: h, graph: { f: fnum, vas: [x0.num()], has: [ya.num()], obl: null, pts: gpts } };
+}
+
+/* ================= Graph ================= */
+const graph = (() => {
+  const cv = document.getElementById('cv'), ctx = cv.getContext('2d'), ro = document.getElementById('readout');
+  let data = null, view = null, W = 0, H = 0, hoverX = null, drag = null;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  function resize() {
+    const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    W = r.width; H = r.height;
+    cv.width = Math.max(1, Math.round(W * dpr)); cv.height = Math.max(1, Math.round(H * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function fit() {
+    if (!data) return;
+    const xs = [0], ys = [0];
+    data.pts.forEach(p => { if (p.kind !== 'extra') { xs.push(p.x); ys.push(p.y); } });
+    data.vas.forEach(v => xs.push(v)); data.has.forEach(v => ys.push(v));
+    let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const sx = Math.max(x1 - x0, 2), sy = Math.max(y1 - y0, 2);
+    x0 -= sx * 0.4 + 1; x1 += sx * 0.4 + 1; y0 -= sy * 0.35 + 1; y1 += sy * 0.35 + 1;
+    view = { x0, x1, y0, y1 };
+    if (document.getElementById('eqscale').checked) equalize();
+  }
+  function equalize() {
+    if (!W || !H) return;
+    const ux = (view.x1 - view.x0) / W, uy = (view.y1 - view.y0) / H, u = Math.max(ux, uy);
+    const cx = (view.x0 + view.x1) / 2, cy = (view.y0 + view.y1) / 2;
+    view = { x0: cx - u * W / 2, x1: cx + u * W / 2, y0: cy - u * H / 2, y1: cy + u * H / 2 };
+  }
+  const X = x => (x - view.x0) / (view.x1 - view.x0) * W;
+  const Y = y => H - (y - view.y0) / (view.y1 - view.y0) * H;
+  function nice(span, px) {
+    const raw = span / Math.max(2, px / 64), mag = 10 ** Math.floor(Math.log10(raw)), n = raw / mag;
+    return (n < 1.5 ? 1 : n < 3.5 ? 2 : n < 7.5 ? 5 : 10) * mag;
+  }
+  const lbl = (v, st) => { const k = Math.max(0, -Math.floor(Math.log10(st) + 1e-9)); let s = v.toFixed(k); if (Number(s) === 0) s = '0'; return s.replace('.', ',').replace('-', '−'); };
+  function draw() {
+    if (!view) return;
+    const C = { bg: css('--plot-bg'), grid: css('--grid'), axis: css('--axis'), ink: css('--ink'), muted: css('--muted'), curve: css('--curve'), asym: css('--asym'), accent: css('--accent'), panel: css('--panel') };
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+    const sx = nice(view.x1 - view.x0, W), sy = nice(view.y1 - view.y0, H);
+    ctx.lineWidth = 1; ctx.strokeStyle = C.grid; ctx.beginPath();
+    for (let v = Math.ceil(view.x0 / sx) * sx; v <= view.x1; v += sx) { const px = Math.round(X(v)) + .5; ctx.moveTo(px, 0); ctx.lineTo(px, H); }
+    for (let v = Math.ceil(view.y0 / sy) * sy; v <= view.y1; v += sy) { const py = Math.round(Y(v)) + .5; ctx.moveTo(0, py); ctx.lineTo(W, py); }
+    ctx.stroke();
+    // axes
+    const ox = Math.min(Math.max(X(0), 0), W), oy = Math.min(Math.max(Y(0), 0), H);
+    ctx.strokeStyle = C.axis; ctx.fillStyle = C.axis; ctx.lineWidth = 1.3; ctx.beginPath();
+    ctx.moveTo(0, oy); ctx.lineTo(W - 2, oy); ctx.moveTo(ox, H); ctx.lineTo(ox, 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W - 1, oy); ctx.lineTo(W - 9, oy - 4); ctx.lineTo(W - 9, oy + 4); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(ox, 1); ctx.lineTo(ox - 4, 9); ctx.lineTo(ox + 4, 9); ctx.fill();
+    ctx.font = '12px "Be Vietnam Pro", system-ui, sans-serif'; ctx.fillStyle = C.muted;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for (let v = Math.ceil(view.x0 / sx) * sx; v <= view.x1; v += sx) {
+      if (Math.abs(v) < sx / 2) continue; const px = X(v); if (px < 12 || px > W - 16) continue;
+      ctx.beginPath(); ctx.moveTo(px, oy - 3); ctx.lineTo(px, oy + 3); ctx.strokeStyle = C.axis; ctx.stroke();
+      ctx.fillText(lbl(v, sx), px, Math.min(oy + 5, H - 16));
+    }
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    for (let v = Math.ceil(view.y0 / sy) * sy; v <= view.y1; v += sy) {
+      if (Math.abs(v) < sy / 2) continue; const py = Y(v); if (py < 14 || py > H - 10) continue;
+      ctx.beginPath(); ctx.moveTo(ox - 3, py); ctx.lineTo(ox + 3, py); ctx.strokeStyle = C.axis; ctx.stroke();
+      ctx.fillText(lbl(v, sy), Math.max(ox - 6, 26), py);
+    }
+    ctx.font = 'italic 600 14px "Be Vietnam Pro", system-ui, serif'; ctx.fillStyle = C.ink;
+    ctx.textAlign = 'right'; ctx.textBaseline = 'top'; ctx.fillText('x', W - 6, oy + 6);
+    ctx.textAlign = 'left'; ctx.fillText('y', ox + 8, 4);
+    if (X(0) > 0 && X(0) < W && Y(0) > 0 && Y(0) < H) { ctx.textAlign = 'right'; ctx.fillText('O', ox - 4, oy + 3); }
+    if (!data) return;
+    // asymptotes
+    ctx.save(); ctx.setLineDash([6, 5]); ctx.strokeStyle = C.asym; ctx.lineWidth = 1.4; ctx.beginPath();
+    data.vas.forEach(v => { ctx.moveTo(X(v), 0); ctx.lineTo(X(v), H); });
+    data.has.forEach(v => { ctx.moveTo(0, Y(v)); ctx.lineTo(W, Y(v)); });
+    if (data.obl) { const { m, b } = data.obl; ctx.moveTo(X(view.x0), Y(m * view.x0 + b)); ctx.lineTo(X(view.x1), Y(m * view.x1 + b)); }
+    ctx.stroke();
+    // projections from extrema/center
+    ctx.setLineDash([3, 4]); ctx.lineWidth = 1; ctx.strokeStyle = C.muted; ctx.beginPath();
+    data.pts.filter(p => p.kind === 'ext' || p.kind === 'center').forEach(p => { const px = X(p.x), py = Y(p.y); ctx.moveTo(px, py); ctx.lineTo(px, oy); ctx.moveTo(px, py); ctx.lineTo(ox, py); });
+    ctx.stroke(); ctx.restore();
+    // curve
+    ctx.strokeStyle = C.curve; ctx.lineWidth = 2.4; ctx.lineJoin = 'round'; ctx.beginPath();
+    const n = Math.ceil(W * 2), dx = (view.x1 - view.x0) / n; let pen = false, px0 = null;
+    for (let i = 0; i <= n; i++) {
+      const x = view.x0 + i * dx;
+      if (px0 !== null && data.vas.some(v => (px0 - v) * (x - v) <= 0)) pen = false;
+      px0 = x;
+      const y = data.f(x);
+      if (!isFinite(y)) { pen = false; continue; }
+      const py = Math.max(-4 * H, Math.min(5 * H, Y(y)));
+      if (pen) ctx.lineTo(X(x), py); else { ctx.moveTo(X(x), py); pen = true; }
+    }
+    ctx.stroke();
+    // points
+    const seen = [];
+    data.pts.forEach(p => {
+      const px = X(p.x), py = Y(p.y);
+      if (px < -5 || px > W + 5 || py < -5 || py > H + 5) return;
+      if (seen.some(s => Math.hypot(s[0] - px, s[1] - py) < 2 && !p.label)) return;
+      seen.push([px, py]);
+      ctx.beginPath(); ctx.arc(px, py, p.kind === 'extra' ? 3 : 4.5, 0, 7);
+      ctx.fillStyle = p.kind === 'extra' ? C.curve : C.accent; ctx.fill();
+      ctx.lineWidth = 1.5; ctx.strokeStyle = C.bg; ctx.stroke();
+      if (p.label) {
+        ctx.font = '600 13px "Lexend", system-ui, sans-serif'; ctx.fillStyle = C.accent;
+        ctx.textAlign = 'left'; ctx.textBaseline = p.label === 'CT' ? 'top' : 'bottom';
+        ctx.fillText(p.label, px + 7, p.label === 'CT' ? py + 4 : py - 4);
+      }
+    });
+    // hover
+    if (hoverX !== null) {
+      const y = data.f(hoverX);
+      if (isFinite(y)) {
+        const px = X(hoverX), py = Y(y);
+        if (py > -10 && py < H + 10) { ctx.beginPath(); ctx.arc(px, py, 5, 0, 7); ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.stroke(); }
+        ro.hidden = false; ro.textContent = `x = ${fmtPlain(hoverX)}   y = ${fmtPlain(y)}`;
+      } else ro.hidden = true;
+    } else ro.hidden = true;
+  }
+  function zoom(f, cx, cy) {
+    if (!view) return;
+    if (cx === undefined) { cx = (view.x0 + view.x1) / 2; cy = (view.y0 + view.y1) / 2; }
+    view = { x0: cx + (view.x0 - cx) * f, x1: cx + (view.x1 - cx) * f, y0: cy + (view.y0 - cy) * f, y1: cy + (view.y1 - cy) * f };
+    draw();
+  }
+  const toWorld = e => { const r = cv.getBoundingClientRect(); const mx = e.clientX - r.left, my = e.clientY - r.top; return [view.x0 + mx / W * (view.x1 - view.x0), view.y0 + (H - my) / H * (view.y1 - view.y0), mx, my]; };
+  cv.addEventListener('pointerdown', e => { if (!view) return; cv.setPointerCapture(e.pointerId); drag = { x: e.clientX, y: e.clientY, v: { ...view } }; });
+  cv.addEventListener('pointermove', e => {
+    if (!view) return;
+    if (drag) {
+      const kx = (drag.v.x1 - drag.v.x0) / W, ky = (drag.v.y1 - drag.v.y0) / H;
+      const ddx = (e.clientX - drag.x) * kx, ddy = (e.clientY - drag.y) * ky;
+      view = { x0: drag.v.x0 - ddx, x1: drag.v.x1 - ddx, y0: drag.v.y0 + ddy, y1: drag.v.y1 + ddy };
+    }
+    hoverX = toWorld(e)[0]; draw();
+  });
+  const end = () => { drag = null; };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+  cv.addEventListener('pointerleave', () => { if (!drag) { hoverX = null; draw(); } });
+  cv.addEventListener('wheel', e => { if (!view) return; e.preventDefault(); const [wx, wy] = toWorld(e); zoom(e.deltaY > 0 ? 1.15 : 1 / 1.15, wx, wy); }, { passive: false });
+  document.getElementById('zin').onclick = () => zoom(1 / 1.3);
+  document.getElementById('zout').onclick = () => zoom(1.3);
+  document.getElementById('zfit').onclick = () => { fit(); draw(); };
+  document.getElementById('eqscale').onchange = () => { fit(); draw(); };
+  new ResizeObserver(() => { resize(); if (data && !view) fit(); draw(); }).observe(cv);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => draw());
+  new MutationObserver(() => draw()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  return {
+    set(d) { data = d; resize(); fit(); draw(); },
+    clear() { data = null; draw(); }
+  };
+})();
+
+/* ================= Wiring ================= */
+const TYPES = {
+  cubic: { fields: ['a', 'b', 'c', 'd'], run: anCubic, samples: [
+    ['x³ − 3x² + 2', ['1', '-3', '0', '2']], ['−x³ + 3x + 1', ['-1', '0', '3', '1']],
+    ['x³ + 3x² + 3x + 1', ['1', '3', '3', '1']], ['−x³ + x² − x + 2', ['-1', '1', '-1', '2']]] },
+  rational: { fields: ['a', 'b', 'c', 'd', 'e'], run: anRational, samples: [
+    ['(x² − 2x + 2)/(x − 1)', ['1', '-2', '2', '1', '-1']], ['(x² − x − 2)/(x − 1)', ['1', '-1', '-2', '1', '-1']],
+    ['(−x² + 3x − 3)/(x − 2)', ['-1', '3', '-3', '1', '-2']], ['(2x² + x + 1)/(x + 1)', ['2', '1', '1', '1', '1']]] },
+  homo: { fields: ['a', 'b', 'c', 'd'], run: anHomo, samples: [
+    ['(2x − 1)/(x + 1)', ['2', '-1', '1', '1']], ['(x + 2)/(x − 1)', ['1', '2', '1', '-1']],
+    ['(−x + 3)/(2x − 4)', ['-1', '3', '2', '-4']], ['2/(x − 1)', ['0', '2', '1', '-1']]] }
+};
+let cur = 'cubic';
+function parseFr(raw) {
+  const s = String(raw).trim().replace(/\s+/g, '').replace(/[−–]/g, '-').replace(/,/g, '.');
+  if (s === '') return ZERO;
+  const m = s.match(/^([+-]?)(\d+\.?\d*|\.\d+)(?:\/(\d+\.?\d*|\.\d+))?$/);
+  if (!m) throw new Error('bad');
+  const dec = t => { const [i, f = ''] = t.split('.'); return new Fr(BigInt((i || '0') + f), 10n ** BigInt(f.length)); };
+  let v = dec(m[2]);
+  if (m[3] !== undefined) { const den = dec(m[3]); if (den.isZero()) throw new Error('bad'); v = v.div(den); }
+  return m[1] === '-' ? v.neg() : v;
+}
+function run() {
+  const t = TYPES[cur], co = {}; let ok = true;
+  t.fields.forEach(f => {
+    const el = document.getElementById(cur + '-' + f);
+    try { co[f] = parseFr(el.value); el.classList.remove('bad'); el.removeAttribute('aria-invalid'); }
+    catch (e) { el.classList.add('bad'); el.setAttribute('aria-invalid', 'true'); ok = false; }
+  });
+  const pv = document.getElementById('preview'), st = document.getElementById('steps');
+  if (!ok) { pv.innerHTML = '<span class="err">Có ô hệ số chưa đúng định dạng (ví dụ hợp lệ: 2, -0,5, 3/4).</span>'; return; }
+  let res;
+  try { res = t.run(co); } catch (e) { res = { error: 'Không tính được với bộ hệ số này: ' + e.message }; }
+  if (res.error) {
+    pv.innerHTML = `<span class="err">${res.error}</span>`;
+    st.innerHTML = ''; graph.clear(); return;
+  }
+  pv.innerHTML = `\\(\\displaystyle y = ${res.fnTex}\\)`;
+  st.innerHTML = res.html;
+  graph.set(res.graph);
+  typeset([pv, st]);
+}
+let timer = null;
+const schedule = () => { clearTimeout(timer); timer = setTimeout(run, 250); };
+document.querySelectorAll('.cf input').forEach(el => el.addEventListener('input', schedule));
+function renderSamples() {
+  const box = document.getElementById('samples');
+  box.innerHTML = '<span class="lbl">Ví dụ:</span>' + TYPES[cur].samples.map((s, i) => `<button class="chip" data-i="${i}">y = ${s[0]}</button>`).join('');
+  box.querySelectorAll('.chip').forEach(b => b.onclick = () => {
+    const vals = TYPES[cur].samples[+b.dataset.i][1];
+    TYPES[cur].fields.forEach((f, k) => document.getElementById(cur + '-' + f).value = vals[k]);
+    run();
+  });
+}
+document.querySelectorAll('.tab').forEach(tb => tb.addEventListener('click', () => {
+  cur = tb.dataset.type;
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === tb ? 'true' : 'false'));
+  document.querySelectorAll('[data-panel]').forEach(p => p.hidden = p.dataset.panel !== cur);
+  renderSamples(); run();
+}));
+renderSamples();
+run();
+</script>
